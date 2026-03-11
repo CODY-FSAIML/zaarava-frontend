@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 55 57% 92%;
+    --foreground: 354 81% 22%;
+
+    --card: 55 57% 94%;
+    --card-foreground: 354 81% 22%;
+
+    --popover: 55 57% 92%;
+    --popover-foreground: 354 81% 22%;
+
+    --primary: 354 81% 22%;
+    --primary-foreground: 55 57% 92%;
+
+    --secondary: 55 40% 86%;
+    --secondary-foreground: 354 81% 22%;
+
+    --muted: 55 30% 88%;
+    --muted-foreground: 354 30% 35%;
+
+    --accent: 354 65% 26%;
+    --accent-foreground: 55 57% 92%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 55 57% 92%;
+
+    --border: 55 30% 83%;
+    --input: 55 30% 83%;
+    --ring: 354 81% 22%;
+
+    --radius: 0rem;
+
+    /* Zaarava brand colors */
+    --maroon: 354 81% 22%;
+    --maroon-light: 354 65% 30%;
+    --cream: 55 57% 92%;
+    --warm-gold: 38 90% 65%;
+    --art-overlay: 354 81% 22%;
+    
+    /* Transitions */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 354 81% 22%;
+    --foreground: 55 57% 92%;
+
+    --card: 354 65% 18%;
+    --card-foreground: 55 57% 92%;
+
+    --popover: 354 81% 22%;
+    --popover-foreground: 55 57% 92%;
+
+    --primary: 55 57% 92%;
+    --primary-foreground: 354 81% 22%;
+
+    --secondary: 354 40% 30%;
+    --secondary-foreground: 55 57% 92%;
+
+    --muted: 354 40% 30%;
+    --muted-foreground: 55 30% 75%;
+
+    --accent: 354 50% 35%;
+    --accent-foreground: 55 57% 92%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 55 57% 92%;
+
+    --border: 354 40% 30%;
+    --input: 354 40% 30%;
+    --ring: 55 57% 92%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-light antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-normal tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Warli art patterns - enhanced with darker maroon overlay */
+  .warli-pattern-bg {
+    @apply relative;
+  }
+
+  .warli-pattern-bg::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none z-0;
+    background-image: url('/src/assets/tribal-pattern-refined.jpg');
+    background-size: 300px;
+    background-repeat: repeat;
+    background-position: center;
+    opacity: 0.06;
+  }
+
+  .warli-border-top {
+    @apply relative pt-20;
+  }
+
+  .warli-border-top::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-24 pointer-events-none z-0;
+    background-image: url('/src/assets/tribal-border-refined.jpg');
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: 0.25;
+  }
+
+  .warli-border-bottom {
+    @apply relative pb-20;
+  }
+
+  .warli-border-bottom::after {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-24 pointer-events-none z-0;
+    background-image: url('/src/assets/tribal-border-refined.jpg');
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: 0.25;
+  }
+
+  /* Artistic accent elements */
+  .art-accent {
+    @apply relative;
+  }
+
+  .art-accent::before {
+    content: '';
+    @apply absolute pointer-events-none z-0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.08;
+  }
+
+  /* Cultural typography */
+  .cultural-heading {
+    @apply font-cultural font-semibold tracking-tight;
+  }
+
+  .cultural-button {
+    @apply font-cultural tracking-wider;
+  }
+}
