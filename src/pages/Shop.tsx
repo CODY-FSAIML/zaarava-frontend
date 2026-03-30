@@ -20,6 +20,8 @@ interface Product {
   category: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Shop = () => {
   // Read category filter from URL
   const [searchParams] = useSearchParams();
@@ -44,7 +46,7 @@ const Shop = () => {
     setLoading(true);
     
     // Build the Django API URL dynamically
-    let apiUrl = 'http://localhost:8000/api/products/';
+    let apiUrl = `${API_URL}/api/products/`;
     if (categoryFilter) {
       apiUrl += `?category=${categoryFilter}`;
     }

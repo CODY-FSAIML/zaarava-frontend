@@ -16,6 +16,8 @@ interface Product {
   category: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const ProductDetail = () => {
     setLoading(true);
     
     // 1. Fetch the specific product clicked
-    fetch(`http://localhost:8000/api/products/${id}/`)
+    fetch(`${API_URL}/api/products/${id}/`)
       .then(res => res.json())
       .then(data => {
         setProduct({
@@ -49,7 +51,7 @@ const ProductDetail = () => {
       .catch(err => console.error("Error fetching product details:", err));
 
     // 2. Fetch all products for the "You May Also Like" section
-    fetch(`http://localhost:8000/api/products/`)
+    fetch(`${API_URL}/api/products/`)
       .then(res => res.json())
       .then(data => {
         const formatted = data.map((item: any) => ({

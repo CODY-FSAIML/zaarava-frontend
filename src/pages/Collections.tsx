@@ -19,6 +19,8 @@ interface Product {
   category: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Collections = () => {
   // Static Lookbook Items (Mood board style)
   const lookbookItems = [
@@ -33,7 +35,7 @@ const Collections = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/products/')
+    fetch(`${API_URL}/api/products/`)
       .then(res => res.json())
       .then(data => {
         const formatted = data.map((item: any) => ({

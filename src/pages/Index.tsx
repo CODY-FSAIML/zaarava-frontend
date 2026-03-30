@@ -28,6 +28,8 @@ interface Product {
   category: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const testimonials = [
   {
     name: "Priya Sharma",
@@ -63,7 +65,7 @@ const Index = () => {
 
   // --- NEW: Fetch Latest Products from Django ---
   useEffect(() => {
-    fetch('http://localhost:8000/api/products/')
+    fetch(`${API_URL}/api/products/`)
       .then(res => res.json())
       .then(data => {
         const formatted = data.map((item: any) => ({
