@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, subtotal } = useCart();
   
@@ -20,7 +22,7 @@ const Cart = () => {
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
-      const response = await fetch("http://localhost:8000/api/create-checkout-session/", {
+      const response = await fetch(`${API_URL}/api/create-checkout-session/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
