@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
@@ -9,27 +10,26 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { SlidersHorizontal } from "lucide-react";
-import heroCoordMain from "@/assets/hero-coord-main.jpg";
-import modelCoord2 from "@/assets/model-coord-2.jpg";
-import modelCoord3 from "@/assets/model-coord-3.jpg";
-import modelCoord4 from "@/assets/model-coord-4.jpg";
-import modelKurti from "@/assets/model-kurti-1.jpg";
-import modelDress from "@/assets/model-dress-1.jpg";
-import modelTop from "@/assets/model-top-1.jpg";
-import modelSkirt from "@/assets/model-skirt-1.jpg";
 
-const allProducts = [
-  { id: "1", name: "Sage Embroidered Co-ord", price: 3200, image: heroCoordMain, category: "Co-ords" },
-  { id: "2", name: "Terracotta Blazer Set", price: 4100, image: modelCoord2, category: "Co-ords" },
-  { id: "3", name: "Ivory Maroon Palazzo Set", price: 3800, image: modelCoord3, category: "Co-ords" },
-  { id: "4", name: "Navy Heritage Co-ord", price: 3600, image: modelCoord4, category: "Co-ords" },
-  { id: "5", name: "Embroidered Kurti", price: 2800, image: modelKurti, category: "Kurtis" },
-  { id: "6", name: "Floral Maxi Dress", price: 3500, image: modelDress, category: "Dresses" },
-  { id: "7", name: "Indo-Western Top", price: 1800, image: modelTop, category: "Tops" },
-  { id: "8", name: "Ethnic Skirt", price: 2200, image: modelSkirt, category: "Skirts" },
-];
+// Define the shape of our product
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+}
 
 const Shop = () => {
+  // Read category filter from URL
+  const [searchParams] = useSearchParams();
+  const categoryFilter = searchParams.get("category");
+
+  // Dynamic state for Django API
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Filter UI states
   const [sortBy, setSortBy] = useState("newest");
   const [priceRange, setPriceRange] = useState([1000, 5000]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -38,6 +38,35 @@ const Shop = () => {
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const colors = ["Sage", "Terracotta", "Ivory", "Navy", "Maroon", "Black"];
   const fabrics = ["Cotton", "Silk", "Linen", "Georgette", "Chanderi"];
+
+  // Fetch Data from Django based on URL Category
+  useEffect(() => {
+    setLoading(true);
+    
+    // Build the Django API URL dynamically
+    let apiUrl = 'http://localhost:8000/api/products/';
+    if (categoryFilter) {
+      apiUrl += `?category=${categoryFilter}`;
+    }
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        const formattedProducts = data.map((item: any) => ({
+          id: item.id.toString(),
+          name: item.name,
+          price: parseFloat(item.price),
+          image: item.image,
+          category: item.category.name
+        }));
+        setAllProducts(formattedProducts);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching products:", err);
+        setLoading(false);
+      });
+  }, [categoryFilter]); // Re-fetches if the URL category changes
 
   const handleSizeToggle = (size: string) => {
     setSelectedSizes(prev => 
@@ -142,7 +171,7 @@ const Shop = () => {
         <section className="py-12 md:py-16 bg-secondary/20 warli-border-bottom">
           <div className="container mx-auto px-4">
             <h1 className="cultural-heading text-4xl md:text-5xl lg:text-6xl text-foreground text-center mb-4">
-              Shop Collection
+              Shop {categoryFilter ? <span className="capitalize">{categoryFilter}</span> : "Collection"}
             </h1>
             <p className="text-center text-muted-foreground text-lg font-light">
               Discover timeless Indo-Western pieces
@@ -207,11 +236,22 @@ const Shop = () => {
 
               {/* Product Grid */}
               <div className="flex-1">
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {allProducts.map((product) => (
-                    <ProductCard key={product.id} {...product} showQuickView />
-                  ))}
-                </div>
+                {loading ? (
+                  <div className="text-center py-20 text-muted-foreground tracking-widest animate-pulse">
+                    LOADING COLLECTIONS...
+                  </div>
+                ) : allProducts.length === 0 ? (
+                  <div className="text-center py-20">
+                    <p className="text-xl text-muted-foreground font-light mb-4">No products found in this category.</p>
+                    <Button variant="outline" onClick={() => window.location.href = '/shop'}>View All Collections</Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                    {allProducts.map((product) => (
+                      <ProductCard key={product.id} {...product} showQuickView />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

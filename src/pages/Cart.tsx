@@ -1,19 +1,47 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, X, ShoppingBag } from "lucide-react";
+import { Minus, Plus, X, ShoppingBag, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, subtotal } = useCart();
+  
+  // --- NEW: Loading state for checkout button ---
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const shipping = subtotal >= 2000 ? 0 : 99;
   const total = subtotal + shipping;
 
-  const handleCheckout = () => {
-    toast.info("Checkout coming soon! We're working on it.");
+  // --- NEW: Dynamic Stripe Checkout Connection ---
+  const handleCheckout = async () => {
+    setIsCheckingOut(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/create-checkout-session/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: items }),
+      });
+
+      const data = await response.json();
+
+      if (data.checkout_url) {
+        // Redirect to Stripe Checkout or our simulated success page
+        window.location.href = data.checkout_url;
+      } else {
+        toast.error("Failed to initialize checkout.");
+        setIsCheckingOut(false);
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("Something went wrong connecting to the server.");
+      setIsCheckingOut(false);
+    }
   };
 
   return (
@@ -72,9 +100,7 @@ const Cart = () => {
                       <div className="mt-auto flex items-center justify-between">
                         <div className="flex items-center gap-2 md:gap-3">
                           <button
-                            onClick={() =>
-                              updateQuantity(item.id, item.size, -1)
-                            }
+                            onClick={() => updateQuantity(item.id, item.size, -1)}
                             className="w-8 h-8 border border-border hover:border-foreground transition-colors flex items-center justify-center"
                           >
                             <Minus className="h-3 w-3" />
@@ -83,9 +109,7 @@ const Cart = () => {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() =>
-                              updateQuantity(item.id, item.size, 1)
-                            }
+                            onClick={() => updateQuantity(item.id, item.size, 1)}
                             className="w-8 h-8 border border-border hover:border-foreground transition-colors flex items-center justify-center"
                           >
                             <Plus className="h-3 w-3" />
@@ -113,9 +137,7 @@ const Cart = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Shipping</span>
-                      <span>
-                        {shipping === 0 ? "Free" : `₹${shipping}`}
-                      </span>
+                      <span>{shipping === 0 ? "Free" : `₹${shipping}`}</span>
                     </div>
                     {shipping > 0 && (
                       <p className="text-xs text-muted-foreground">
@@ -128,12 +150,21 @@ const Cart = () => {
                     </div>
                   </div>
 
+                  {/* --- NEW: Dynamic Checkout Button --- */}
                   <Button
-                    className="w-full h-12"
+                    className="w-full h-12 transition-all"
                     size="lg"
                     onClick={handleCheckout}
+                    disabled={isCheckingOut}
                   >
-                    PROCEED TO CHECKOUT
+                    {isCheckingOut ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        PROCESSING...
+                      </>
+                    ) : (
+                      "PROCEED TO CHECKOUT"
+                    )}
                   </Button>
                 </div>
               </div>
